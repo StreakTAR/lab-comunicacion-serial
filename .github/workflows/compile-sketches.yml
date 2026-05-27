@@ -1,0 +1,42 @@
+name: Compilar sketches de Arduino
+
+# Disparadores: push o pull request que toque archivos .ino
+on:
+  push:
+    paths:
+      - '**.ino'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - '**.ino'
+      - '.github/workflows/**'
+
+jobs:
+  compile:
+    name: Compilar para Arduino Uno
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        sketch:
+          - parte1_terminal
+          - parte2_terminal_arduino
+          - parte2_interfaz_usuario
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Compilar sketch ${{ matrix.sketch }}
+        uses: arduino/compile-sketches@v1
+        with:
+          fqbn: arduino:avr:uno
+          sketch-paths: |
+            - ${{ matrix.sketch }}
+          libraries: |
+            - name: Servo
+            - name: Keypad
+            - name: LiquidCrystal I2C
+          enable-warnings-report: true
+          verbose: false
